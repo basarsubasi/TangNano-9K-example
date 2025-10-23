@@ -10,9 +10,7 @@ SRCS = 	$(wildcard *.c)       		\
 
 LDSCRIPT = ./linker_brom.ld
 
-RISCV_NAME ?= riscv-none-embed
-RISCV_PATH ?= D:/gnu-mcu-eclipse-riscv-none-gcc-8.2.0
-
+RISCV_PREFIX ?= riscv64-elf
 PYTHON_NAME ?= python
 VDUMPC_PATH ?= ../../sw/vdump8to32.py
 MEM_BASEADDR ?= 0x80000000
@@ -45,11 +43,9 @@ ifeq ($(BENCH),yes)
 	CFLAGS += -fno-inline  
 endif
 
-RISCV_CLIB=$(RISCV_PATH)/$(RISCV_NAME)/lib/$(MARCH)/$(MABI)/
-
-RISCV_OBJCOPY = $(RISCV_PATH)/bin/$(RISCV_NAME)-objcopy
-RISCV_OBJDUMP = $(RISCV_PATH)/bin/$(RISCV_NAME)-objdump
-RISCV_CC = $(RISCV_PATH)/bin/$(RISCV_NAME)-gcc
+RISCV_OBJCOPY = $(RISCV_PREFIX)-objcopy
+RISCV_OBJDUMP = $(RISCV_PREFIX)-objdump
+RISCV_CC = $(RISCV_PREFIX)-gcc
 
 CFLAGS +=  -MD -fstrict-volatile-bitfields 
 LDFLAGS +=  -nostdlib -lgcc -mcmodel=medany -nostartfiles -ffreestanding -Wl,-Bstatic,-T,$(LDSCRIPT),-Map,$(OBJDIR)/$(PROJ_NAME).map,--print-memory-usage

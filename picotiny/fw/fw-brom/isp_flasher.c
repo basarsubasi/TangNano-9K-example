@@ -139,7 +139,7 @@ int main()
     }
 
     if (waitcnt == FW_WAIT_MAXCNT) {
-        void (*flash_vec)(void) = (void (*)(void))(0x00000000);
+        void (*flash_vec)(void) = (void (*)(void))(0x00100000);
         flash_vec();
     }
 

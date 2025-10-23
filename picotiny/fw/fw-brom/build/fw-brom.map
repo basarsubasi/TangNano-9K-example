@@ -1,0 +1,173 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 build/isp_flasher.o
+ .data          0x00000000        0x0 build/isp_flasher.o
+ .bss           0x00000000        0x0 build/isp_flasher.o
+ .data          0x00000000        0x0 build/crt_brom.o
+ .bss           0x00000000        0x0 build/crt_brom.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+BROM             0x80000000         0x00000800
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD build/isp_flasher.o
+LOAD build/crt_brom.o
+LOAD /usr/lib/gcc/riscv64-elf/14.1.0/rv32i/ilp32/libgcc.a
+                0x00000200                        _stack_size = DEFINED (_stack_size)?_stack_size:0x200
+                0x00000000                        _heap_size = DEFINED (_heap_size)?_heap_size:0x0
+
+.vector
+ *crt.o(.text)
+
+.memory         0x80000000       0x54
+ *(.text)
+ .text          0x80000000       0x54 build/crt_brom.o
+                0x80000000                crtStart
+                0x80000054                        end = .
+
+.text.spi_flashio
+                0x80000054      0x170
+ .text.spi_flashio
+                0x80000054      0x170 build/isp_flasher.o
+                0x80000054                spi_flashio
+
+.text.startup.main
+                0x800001c4      0x1d0
+ .text.startup.main
+                0x800001c4      0x1d0 build/isp_flasher.o
+                0x800001c4                main
+
+.rela.dyn       0x80000394        0x0
+ .rela.text     0x80000394        0x0 build/isp_flasher.o
+
+.rodata
+ *(.rdata)
+ *(.rodata .rodata.*)
+ *(.gnu.linkonce.r.*)
+
+.ctors          0x80000394        0x0
+                0x80000394                        . = ALIGN (0x4)
+                0x80000394                        _ctors_start = .
+ *(.init_array*)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+                0x80000394                        . = ALIGN (0x4)
+                0x80000394                        _ctors_end = .
+
+.data           0x80000394        0x4
+ *(.rdata)
+ *(.rodata .rodata.*)
+ *(.gnu.linkonce.r.*)
+ *(.data .data.*)
+ *(.gnu.linkonce.d.*)
+                0x80000398                        . = ALIGN (0x8)
+ *fill*         0x80000394        0x4 
+                0x80000b98                        PROVIDE (__global_pointer$ = (. + 0x800))
+ *(.sdata .sdata.*)
+ *(.gnu.linkonce.s.*)
+                0x80000398                        . = ALIGN (0x8)
+ *(.srodata.cst16)
+ *(.srodata.cst8)
+ *(.srodata.cst4)
+ *(.srodata.cst2)
+ *(.srodata .srodata.*)
+
+.bss            0x80000398        0x0
+                0x80000398                        . = ALIGN (0x4)
+                0x80000398                        _bss_start = .
+ *(.sbss*)
+ *(.gnu.linkonce.sb.*)
+ *(.bss .bss.*)
+ *(.gnu.linkonce.b.*)
+ *(COMMON)
+                0x80000398                        . = ALIGN (0x4)
+                0x80000398                        _bss_end = .
+
+.noinit         0x80000398        0x0
+                0x80000398                        . = ALIGN (0x4)
+ *(.noinit .noinit.*)
+                0x80000398                        . = ALIGN (0x4)
+
+._user_heap     0x80000398        0x0
+                0x80000398                        . = ALIGN (0x8)
+                [!provide]                        PROVIDE (end = .)
+                [!provide]                        PROVIDE (_end = .)
+                [!provide]                        PROVIDE (_heap_start = .)
+                0x80000398                        . = (. + _heap_size)
+                0x80000398                        . = ALIGN (0x8)
+                [!provide]                        PROVIDE (_heap_end = .)
+
+._stack         0x80000398      0x208
+                0x800003a0                        . = ALIGN (0x10)
+ *fill*         0x80000398        0x8 
+                [!provide]                        PROVIDE (_stack_end = .)
+                0x800005a0                        . = (. + _stack_size)
+ *fill*         0x800003a0      0x200 
+                0x800005a0                        . = ALIGN (0x10)
+                0x800005a0                        PROVIDE (_stack_start = .)
+OUTPUT(build/fw-brom.elf elf32-littleriscv)
+
+.debug_info     0x00000000      0x6ba
+ .debug_info    0x00000000      0x696 build/isp_flasher.o
+ .debug_info    0x00000696       0x24 build/crt_brom.o
+
+.debug_abbrev   0x00000000      0x2bf
+ .debug_abbrev  0x00000000      0x2ab build/isp_flasher.o
+ .debug_abbrev  0x000002ab       0x14 build/crt_brom.o
+
+.debug_loclists
+                0x00000000      0x2f7
+ .debug_loclists
+                0x00000000      0x2f7 build/isp_flasher.o
+
+.debug_aranges  0x00000000       0x48
+ .debug_aranges
+                0x00000000       0x28 build/isp_flasher.o
+ .debug_aranges
+                0x00000028       0x20 build/crt_brom.o
+
+.debug_rnglists
+                0x00000000      0x155
+ .debug_rnglists
+                0x00000000      0x155 build/isp_flasher.o
+
+.debug_line     0x00000000      0xbcf
+ .debug_line    0x00000000      0xb25 build/isp_flasher.o
+ .debug_line    0x00000b25       0xaa build/crt_brom.o
+
+.debug_str      0x00000000      0x21e
+ .debug_str     0x00000000      0x21e build/isp_flasher.o
+                                0x214 (size before relaxing)
+ .debug_str     0x0000021e       0x58 build/crt_brom.o
+
+.debug_line_str
+                0x00000000       0xb3
+ .debug_line_str
+                0x00000000       0xb3 build/isp_flasher.o
+                                0x105 (size before relaxing)
+ .debug_line_str
+                0x000000b3       0x4c build/crt_brom.o
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 build/isp_flasher.o
+                                 0x27 (size before relaxing)
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 build/isp_flasher.o
+
+.riscv.attributes
+                0x00000000       0x1c
+ .riscv.attributes
+                0x00000000       0x1c build/isp_flasher.o
+ .riscv.attributes
+                0x0000001c       0x1a build/crt_brom.o
+
+.debug_frame    0x00000000       0x48
+ .debug_frame   0x00000000       0x48 build/isp_flasher.o
