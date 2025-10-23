@@ -168,7 +168,8 @@ if __name__ == '__main__':
         # Erase the sector to be programmed
         # print("Erasing sector", i, "at 0x{:06x}".format(curraddr & 0xFFF000))
         
-        isp_exec_esec(ser, curraddr)
+        # --- MODIFIED LINE: Added 1MB (0x100000) offset ---
+        isp_exec_esec(ser, curraddr + 0x100000)
         
         for j in range( min(16, pagereq - i*16) ):
             wlen = min(pagestep, rembyte - curraddr)
@@ -191,7 +192,9 @@ if __name__ == '__main__':
             
             # Write from page buffer to flash
             # print(f" Programming {j+i*16} at 0x{curraddr:06X}")
-            isp_exec_wpag(ser, curraddr)
+
+            # --- MODIFIED LINE: Added 1MB (0x100000) offset ---
+            isp_exec_wpag(ser, curraddr + 0x100000)
             
             curraddr += pagestep
         
