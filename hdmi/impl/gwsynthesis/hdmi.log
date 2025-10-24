@@ -44,8 +44,16 @@ WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("/home/basa
 Compiling module 'svo_term(SVO_MODE="640x480V")'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":23)
 Extracting RAM for identifier 'mem'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":64)
 WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":54)
-ERROR (EX3784) : Index 2048 is out of range [0:2047] for 'mem'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":78)
-Module 'svo_term' remains a black box due to errors in its contents("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":23)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 8("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":257)
+WARN  (EX3791) : Expression size 13 truncated to fit in target size 12("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":300)
+WARN  (EX3791) : Expression size 13 truncated to fit in target size 12("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":301)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 12("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":348)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":530)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":532)
+WARN  (EX3791) : Expression size 13 truncated to fit in target size 12("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":549)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":604)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":615)
+WARN  (EX3791) : Expression size 6 truncated to fit in target size 5("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_term.v":617)
 Compiling module 'svo_overlay(SVO_MODE="640x480V")'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v":250)
 WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v":275)
 WARN  (EX3791) : Expression size 2 truncated to fit in target size 1("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v":303)
@@ -73,4 +81,32 @@ WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/basa
 WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_enc.v":155)
 WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_enc.v":159)
 Compiling module 'svo_tmds'("/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_tmds.v":23)
+WARN  (EX2565) : Input 'in_axis_tvalid' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[7]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[6]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[5]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[4]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[3]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[2]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[1]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+WARN  (EX2565) : Input 'in_axis_tdata[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("/home/basar/repositories/TangNano-9K-example/hdmi/src/svo_hdmi.v":100)
+NOTE  (EX0101) : Current top module is "top"
+[5%] Running netlist conversion ...
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+[95%] Generate netlist file "/home/basar/repositories/TangNano-9K-example/hdmi/impl/gwsynthesis/hdmi.vg" completed
+[100%] Generate report file "/home/basar/repositories/TangNano-9K-example/hdmi/impl/gwsynthesis/hdmi_syn.rpt.html" completed
 GowinSynthesis finish
