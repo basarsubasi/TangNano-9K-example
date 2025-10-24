@@ -1,0 +1,62 @@
+[
+ {
+  "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_openldi.v",
+  "InstLine" : 23,
+  "InstName" : "svo_openldi",
+  "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_openldi.v",
+  "ModuleLine" : 23,
+  "ModuleName" : "svo_openldi"
+ },
+ {
+  "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_tcard.v",
+  "InstLine" : 23,
+  "InstName" : "svo_tcard",
+  "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_tcard.v",
+  "ModuleLine" : 23,
+  "ModuleName" : "svo_tcard"
+ },
+ {
+  "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+  "InstLine" : 178,
+  "InstName" : "svo_dim",
+  "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+  "ModuleLine" : 178,
+  "ModuleName" : "svo_dim",
+  "SubInsts" : [
+   {
+    "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+    "InstLine" : 219,
+    "InstName" : "svo_axis_pipe",
+    "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+    "ModuleLine" : 31,
+    "ModuleName" : "svo_axis_pipe"
+   }
+  ]
+ },
+ {
+  "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+  "InstLine" : 359,
+  "InstName" : "svo_rect",
+  "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_utils.v",
+  "ModuleLine" : 359,
+  "ModuleName" : "svo_rect"
+ },
+ {
+  "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_vdma.v",
+  "InstLine" : 23,
+  "InstName" : "svo_vdma",
+  "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_vdma.v",
+  "ModuleLine" : 23,
+  "ModuleName" : "svo_vdma",
+  "SubInsts" : [
+   {
+    "InstFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_vdma.v",
+    "InstLine" : 255,
+    "InstName" : "fifo",
+    "ModuleFile" : "/home/basar/repositories/TangNano-9K-example/hdmi/src/hdmi/svo_vdma.v",
+    "ModuleLine" : 344,
+    "ModuleName" : "svo_vdma_crossclock_fifo"
+   }
+  ]
+ }
+]
