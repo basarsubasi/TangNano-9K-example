@@ -64,96 +64,90 @@ module svo_term #(
 	reg [7:0] mem [0:MEM_DEPTH-1];
 	reg [MEM_ABITS-1:0] mem_start, mem_stop;
 
-	// Initialize text memory with multi-line message
+	// Initialize text memory with the user's message, 80 chars per line, 24x24 font
 	integer init_i;
 	initial begin
 		// Clear memory
 		for (init_i = 0; init_i < MEM_DEPTH; init_i = init_i + 1)
 			mem[init_i] = 8'h00;
-		
-		// Write "HELLO WORLD" with line break and "FPGA VIDEO"
-		// Line 1: "HELLO WORLD"
-		mem[0]  = 8'h48;  // 'H'
-		mem[1]  = 8'h45;  // 'E'
-		mem[2]  = 8'h4C;  // 'L'
-		mem[3]  = 8'h4C;  // 'L'
-		mem[4]  = 8'h4F;  // 'O'
-		mem[5]  = 8'h20;  // ' ' (space)
-		mem[6]  = 8'h57;  // 'W'
-		mem[7]  = 8'h4F;  // 'O'
-		mem[8]  = 8'h52;  // 'R'
-		mem[9]  = 8'h4C;  // 'L'
-		mem[10] = 8'h44;  // 'D'
-		mem[11] = 8'h0A;  // '\n' (newline)
-		
-		// Line 2: "FPGA VIDEO"
-		mem[12] = 8'h46;  // 'F'
-		mem[13] = 8'h50;  // 'P'
-		mem[14] = 8'h47;  // 'G'
-		mem[15] = 8'h41;  // 'A'
-		mem[16] = 8'h20;  // ' ' (space)
-		mem[17] = 8'h56;  // 'V'
-		mem[18] = 8'h49;  // 'I'
-		mem[19] = 8'h44;  // 'D'
-		mem[20] = 8'h45;  // 'E'
-		mem[21] = 8'h4F;  // 'O'
+
+	integer idx;
+	idx = 0;
+	
+	// Add blank lines for vertical centering (1080p = 45 lines, message ~16 lines, start at line 14)
+	for (integer i = 0; i < 14; i = i + 1) begin
+		for (integer j = 0; j < 80; j = j + 1) mem[idx++] = " ";
+		mem[idx++] = 0x0A;
 	end
-
-	reg [MEM_ABITS-1:0] mem_portA_addr;
-	reg [7:0] mem_portA_rdata;
-	reg [7:0] mem_portA_wdata;
-	reg mem_portA_wen;
-
-	reg [MEM_ABITS-1:0] mem_portB_addr;
-	reg [7:0] mem_portB_rdata;
-
-	reg [MEM_ABITS-1:0] mem_start_GR, mem_stop_GR;
-	reg [MEM_ABITS-1:0] mem_start_B1, mem_stop_B1;
-	reg [MEM_ABITS-1:0] mem_start_B2, mem_stop_B2;
-	reg [MEM_ABITS-1:0] mem_start_B3, mem_stop_B3;
-	reg [MEM_ABITS-1:0] mem_start_B,  mem_stop_B;
-
-	function [MEM_ABITS-1:0] mem_bin2gray(input [MEM_ABITS-1:0] in);
-		integer i;
-		reg [MEM_ABITS:0] temp;
-		begin
-			temp = in;
-			for (i=0; i<MEM_ABITS; i=i+1)
-				mem_bin2gray[i] = ^temp[i +: 2];
-		end
-	endfunction
-
-	function [MEM_ABITS-1:0] mem_gray2bin(input [MEM_ABITS-1:0] in);
-		integer i;
-		begin
-			for (i=0; i<MEM_ABITS; i=i+1)
-				mem_gray2bin[i] = ^(in >> i);
-		end
-	endfunction
-
-	always @(posedge clk) begin
-		if (mem_portA_wen) begin
-			mem_portA_rdata <= 'bx;
-			mem[mem_portA_addr] <= mem_portA_wdata;
-		end else begin
-			mem_portA_rdata <= mem[mem_portA_addr];
-		end
-
-		mem_start_GR <= mem_bin2gray(mem_start);
-		mem_stop_GR <= mem_bin2gray(mem_stop);
-	end
-
-	always @(posedge oclk) begin
-		if (pipeline_en)
-			mem_portB_rdata <= mem_portB_addr != mem_stop_B ? mem[mem_portB_addr] : 0;
-
-		mem_start_B1 <= mem_start_GR;
-		mem_start_B2 <= mem_start_B1;
-		mem_start_B3 <= mem_gray2bin(mem_start_B2);
-
-		mem_stop_B1 <= mem_stop_GR;
-		mem_stop_B2 <= mem_stop_B1;
-		mem_stop_B3 <= mem_gray2bin(mem_stop_B2);
+	
+	// Line 1 (centered, 51 chars)
+	for (integer i = 0; i < 14; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "S"; mem[idx++] = "e"; mem[idx++] = "v"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "E"; mem[idx++] = "n"; mem[idx++] = "g"; mem[idx++] = "u"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "h"; mem[idx++] = "o"; mem[idx++] = "c"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "i"; mem[idx++] = "y"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "y"; mem[idx++] = "o"; mem[idx++] = "l"; mem[idx++] = "l"; mem[idx++] = "a"; mem[idx++] = "r"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "e"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "i"; mem[idx++] = "y"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "i"; mem[idx++] = 0x0A;
+	
+	// Line 2 (centered, 51 chars)
+	for (integer i = 0; i < 14; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "b"; mem[idx++] = "u"; mem[idx++] = " "; mem[idx++] = "h"; mem[idx++] = "a"; mem[idx++] = "y"; mem[idx++] = "a"; mem[idx++] = "t"; mem[idx++] = "t"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "t"; mem[idx++] = "a"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "f"; mem[idx++] = "i"; mem[idx++] = "r"; mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "t"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "y"; mem[idx++] = "a"; mem[idx++] = "k"; mem[idx++] = "a"; mem[idx++] = "l"; mem[idx++] = "a"; mem[idx++] = "y"; mem[idx++] = "a"; mem[idx++] = "n"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "n"; mem[idx++] = "s"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = 0x0A;
+	
+	// Line 3 (centered, 30 chars)
+	for (integer i = 0; i < 25; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "a"; mem[idx++] = "r"; mem[idx++] = "a"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "d"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "y"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "a"; mem[idx++] = "l"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "."; mem[idx++] = 0x0A;
+	
+	// Blank line
+	for (integer i = 0; i < 80; i = i + 1) mem[idx++] = " "; mem[idx++] = 0x0A;
+	
+	// Line 4 (centered, 59 chars)
+	for (integer i = 0; i < 10; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "S"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "c"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "t"; mem[idx++] = "e"; mem[idx++] = "k"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "k"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = ","; mem[idx++] = " \""; mem[idx++] = "h"; mem[idx++] = "a"; mem[idx++] = "y"; mem[idx++] = "a"; mem[idx++] = "t"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "\""; mem[idx++] = 0x0A;
+	
+	// Line 5 (centered, 58 chars)
+	for (integer i = 0; i < 11; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "y"; mem[idx++] = "e"; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "c"; mem[idx++] = "e"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "p"; mem[idx++] = "a"; mem[idx++] = "r"; mem[idx++] = "a"; mem[idx++] = "l"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "e"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "m"; mem[idx++] = "e"; mem[idx++] = "y"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "c"; mem[idx++] = "o"; mem[idx++] = "k"; mem[idx++] = " "; mem[idx++] = "c"; mem[idx++] = "o"; mem[idx++] = "k"; mem[idx++] = 0x0A;
+	
+	// Line 6 (centered, 59 chars)
+	for (integer i = 0; i < 10; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "g"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "u"; mem[idx++] = "r"; mem[idx++] = "u"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "e"; mem[idx++] = "y"; mem[idx++] = " "; mem[idx++] = "e"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "e"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = " "; mem[idx++] = "g"; mem[idx++] = "e"; mem[idx++] = "l"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "c"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = 0x0A;
+	
+	// Line 7 (centered, 34 chars)
+	for (integer i = 0; i < 23; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "e"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "m"; mem[idx++] = "e"; mem[idx++] = "y"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "v"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = " "; mem[idx++] = "e"; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "c"; mem[idx++] = "e"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "."; mem[idx++] = 0x0A;
+	
+	// Blank line
+	for (integer i = 0; i < 80; i = i + 1) mem[idx++] = " "; mem[idx++] = 0x0A;
+	
+	// Line 8 (centered, 60 chars)
+	for (integer i = 0; i < 10; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "K"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "h"; mem[idx++] = "i"; mem[idx++] = "c"; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "a"; mem[idx++] = "r"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = "k"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "e"; mem[idx++] = "k"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "m"; mem[idx++] = "e"; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = ","; mem[idx++] = 0x0A;
+	
+	// Line 9 (centered, 58 chars)
+	for (integer i = 0; i < 11; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "r"; mem[idx++] = "l"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = " "; mem[idx++] = "d"; mem[idx++] = "e"; mem[idx++] = "a"; mem[idx++] = "n"; mem[idx++] = "l"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "g"; mem[idx++] = "l"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = "a"; mem[idx++] = "y"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "c"; mem[idx++] = "a"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = "s"; mem[idx++] = "t"; mem[idx++] = "i"; mem[idx++] = "g"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = " "; mem[idx++] = "i"; mem[idx++] = "c"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = 0x0A;
+	
+	// Line 10 (centered, 62 chars)
+	for (integer i = 0; i < 9; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "k"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "a"; mem[idx++] = "s"; mem[idx++] = "t"; mem[idx++] = "a"; mem[idx++] = " "; mem[idx++] = "o"; mem[idx++] = "l"; mem[idx++] = "m"; mem[idx++] = "a"; mem[idx++] = "k"; mem[idx++] = " "; mem[idx++] = "u"; mem[idx++] = "z"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "t"; mem[idx++] = "u"; mem[idx++] = "m"; mem[idx++] = " "; mem[idx++] = "o"; mem[idx++] = "g"; mem[idx++] = "r"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = "c"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = " "; mem[idx++] = "a"; mem[idx++] = "d"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "a"; mem[idx++] = 0x0A;
+	
+	// Line 11 (centered, 43 chars)
+	for (integer i = 0; i < 18; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "t"; mem[idx++] = "e"; mem[idx++] = "s"; mem[idx++] = "e"; mem[idx++] = "k"; mem[idx++] = "k"; mem[idx++] = "u"; mem[idx++] = "r"; mem[idx++] = "u"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "o"; mem[idx++] = "r"; mem[idx++] = "c"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "l"; mem[idx++] = "i"; mem[idx++] = "r"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = "."; mem[idx++] = 0x0A;
+	
+	// Blank line
+	for (integer i = 0; i < 80; i = i + 1) mem[idx++] = " "; mem[idx++] = 0x0A;
+	
+	// Line 12 (centered, 44 chars)
+	for (integer i = 0; i < 18; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "I"; mem[idx++] = "y"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "k"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "d"; mem[idx++] = "o"; mem[idx++] = "g"; mem[idx++] = "d"; mem[idx++] = "u"; mem[idx++] = "n"; mem[idx++] = "u"; mem[idx++] = "z"; mem[idx++] = ","; mem[idx++] = " "; mem[idx++] = "i"; mem[idx++] = "y"; mem[idx++] = "i"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "i"; mem[idx++] = "m"; mem[idx++] = " "; mem[idx++] = "h"; mem[idx++] = "o"; mem[idx++] = "c"; mem[idx++] = "a"; mem[idx++] = "m"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "s"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = "."; mem[idx++] = 0x0A;
+	
+	// Line 13 (centered, 13 chars)
+	for (integer i = 0; i < 33; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "N"; mem[idx++] = "i"; mem[idx++] = "c"; mem[idx++] = "e"; mem[idx++] = " "; mem[idx++] = "s"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = "e"; mem[idx++] = "l"; mem[idx++] = "e"; mem[idx++] = "r"; mem[idx++] = ","; mem[idx++] = 0x0A;
+	
+	// Line 14 (centered, 20 chars)
+	for (integer i = 0; i < 30; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "O"; mem[idx++] = "m"; mem[idx++] = "u"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "b"; mem[idx++] = "o"; mem[idx++] = "y"; mem[idx++] = "u"; mem[idx++] = " "; mem[idx++] = "o"; mem[idx++] = "g"; mem[idx++] = "r"; mem[idx++] = "e"; mem[idx++] = "n"; mem[idx++] = "c"; mem[idx++] = "i"; mem[idx++] = "n"; mem[idx++] = "i"; mem[idx++] = "z"; mem[idx++] = 0x0A;
+	
+	// Line 15 (centered, 12 chars)
+	for (integer i = 0; i < 34; i = i + 1) mem[idx++] = " ";
+	mem[idx++] = "B"; mem[idx++] = "a"; mem[idx++] = "s"; mem[idx++] = "a"; mem[idx++] = "r"; mem[idx++] = " "; mem[idx++] = "S"; mem[idx++] = "u"; mem[idx++] = "b"; mem[idx++] = "a"; mem[idx++] = "s"; mem[idx++] = "i";
 	end
 
 
@@ -194,7 +188,7 @@ module svo_term #(
 		if (!resetn) begin
 			remove_line <= 0;
 			mem_start <= 0;
-			mem_stop <= 22;  // Set to 22 to display the two-line message
+		mem_stop <= 595;  // Set to last used index + 1
 		end else begin
 			if (remove_line) begin
 				if (mem_portA_rdata == "\n" || mem_start == mem_stop) begin
