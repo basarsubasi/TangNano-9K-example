@@ -64,6 +64,41 @@ module svo_term #(
 	reg [7:0] mem [0:MEM_DEPTH-1];
 	reg [MEM_ABITS-1:0] mem_start, mem_stop;
 
+	// Initialize text memory with multi-line message
+	integer init_i;
+	initial begin
+		// Clear memory
+		for (init_i = 0; init_i < MEM_DEPTH; init_i = init_i + 1)
+			mem[init_i] = 8'h00;
+		
+		// Write "HELLO WORLD" with line break and "FPGA VIDEO"
+		// Line 1: "HELLO WORLD"
+		mem[0]  = 8'h48;  // 'H'
+		mem[1]  = 8'h45;  // 'E'
+		mem[2]  = 8'h4C;  // 'L'
+		mem[3]  = 8'h4C;  // 'L'
+		mem[4]  = 8'h4F;  // 'O'
+		mem[5]  = 8'h20;  // ' ' (space)
+		mem[6]  = 8'h57;  // 'W'
+		mem[7]  = 8'h4F;  // 'O'
+		mem[8]  = 8'h52;  // 'R'
+		mem[9]  = 8'h4C;  // 'L'
+		mem[10] = 8'h44;  // 'D'
+		mem[11] = 8'h0A;  // '\n' (newline)
+		
+		// Line 2: "FPGA VIDEO"
+		mem[12] = 8'h46;  // 'F'
+		mem[13] = 8'h50;  // 'P'
+		mem[14] = 8'h47;  // 'G'
+		mem[15] = 8'h41;  // 'A'
+		mem[16] = 8'h20;  // ' ' (space)
+		mem[17] = 8'h56;  // 'V'
+		mem[18] = 8'h49;  // 'I'
+		mem[19] = 8'h44;  // 'D'
+		mem[20] = 8'h45;  // 'E'
+		mem[21] = 8'h4F;  // 'O'
+	end
+
 	reg [MEM_ABITS-1:0] mem_portA_addr;
 	reg [7:0] mem_portA_rdata;
 	reg [7:0] mem_portA_wdata;
@@ -159,7 +194,7 @@ module svo_term #(
 		if (!resetn) begin
 			remove_line <= 0;
 			mem_start <= 0;
-			mem_stop <= 0;
+			mem_stop <= 22;  // Set to 22 to display the two-line message
 		end else begin
 			if (remove_line) begin
 				if (mem_portA_rdata == "\n" || mem_start == mem_stop) begin
@@ -348,7 +383,7 @@ module svo_term #(
 		{oresetn, oresetn_q} <= {oresetn_q, resetn};
 
 	// --------------------------------------------------------------
-	// Pipeline stage 1: basic video timing
+	// Pipeline stage 1: basic video timing (24x24 font scaling)
 
 	reg p1_start_of_frame;
 	reg p1_start_of_line;
@@ -356,13 +391,16 @@ module svo_term #(
 
 	reg [`SVO_XYBITS-1:0] p1_xpos, p1_ypos;
 
+	// For 24x24 scaling, each character cell is 24x24 pixels
+	localparam CHAR_WIDTH = 24;
+	localparam CHAR_HEIGHT = 24;
+
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p1_xpos <= 0;
 			p1_ypos <= 0;
 			p1_valid <= 0;
-		end else
-		if (pipeline_en) begin
+		end else if (pipeline_en) begin
 			p1_valid <= 1;
 			p1_start_of_frame <= !p1_xpos && !p1_ypos;
 			p1_start_of_line <= !p1_xpos;
@@ -376,9 +414,10 @@ module svo_term #(
 	end
 
 	// --------------------------------------------------------------
-	// Pipeline stage 2: text memory addr generator
+	// Pipeline stage 2: text memory addr generator (24x24 font scaling)
 
-	reg [2:0] p2_x, p2_y;
+	reg [4:0] p2_x, p2_y; // up to 24
+	reg [2:0] p2_font_x, p2_font_y; // 0-7 for font lookup
 	reg p2_start_of_frame;
 	reg p2_start_of_line;
 	reg p2_valid;
@@ -388,14 +427,23 @@ module svo_term #(
 	wire [MEM_ABITS-1:0] next_mem_portB_addr;
 	assign next_mem_portB_addr = mem_portB_addr == MEM_DEPTH-1 ? 0 : mem_portB_addr + 1;
 
+	reg [7:0] p2_char_per_line;
+	always @* begin
+		// Number of characters per line = screen width / 24
+		p2_char_per_line = SVO_HOR_PIXELS / CHAR_WIDTH;
+	end
+
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p2_valid <= 0;
 			p2_found_end <= 1;
 			p2_last_req_remline <= 1;
 			request_remove_line_oclk <= 0;
-		end else
-		if (pipeline_en) begin
+			p2_x <= 0;
+			p2_y <= 0;
+			p2_font_x <= 0;
+			p2_font_y <= 0;
+		end else if (pipeline_en) begin
 			p2_start_of_frame <= p1_start_of_frame;
 			p2_start_of_line <= p1_start_of_line;
 			p2_valid <= p1_valid;
@@ -403,6 +451,7 @@ module svo_term #(
 			if (mem_portB_addr == mem_stop_B)
 				p2_found_end <= 1;
 
+			// Map pixel position to character and font pixel
 			if (p1_start_of_frame) begin
 				if (!p2_found_end && !p2_last_req_remline) begin
 					request_remove_line_oclk <= ~request_remove_line_oclk;
@@ -417,24 +466,32 @@ module svo_term #(
 				p2_found_end <= 0;
 				p2_x <= 0;
 				p2_y <= 0;
-			end else
-			if (p1_start_of_line) begin
-				if (p2_y == 7) begin
+				p2_font_x <= 0;
+				p2_font_y <= 0;
+			end else if (p1_start_of_line) begin
+				if (p2_font_y == 23) begin
+					// End of character cell row, move to next text line
 					if (mem_portB_addr != mem_stop_B) begin
 						mem_portB_addr <= next_mem_portB_addr;
 						p2_line_start_addr <= next_mem_portB_addr;
 					end else begin
 						p2_line_start_addr <= mem_stop_B;
 					end
+					p2_font_y <= 0;
 				end else begin
 					mem_portB_addr <= p2_line_start_addr;
+					p2_font_y <= p2_font_y + 1;
 				end
 				p2_x <= 0;
-				p2_y <= p2_y + 1;
+				p2_font_x <= 0;
 			end else begin
-				if (p2_x == 7) begin
+				if (p2_font_x == 23) begin
+					// End of character cell column, move to next character
 					if (mem_portB_addr != mem_stop_B && mem_portB_rdata != "\n")
 						mem_portB_addr <= next_mem_portB_addr;
+					p2_font_x <= 0;
+				end else begin
+					p2_font_x <= p2_font_x + 1;
 				end
 				p2_x <= p2_x + 1;
 			end
@@ -442,9 +499,10 @@ module svo_term #(
 	end
 
 	// --------------------------------------------------------------
-	// Pipeline stage 3: wait for memory
+	// Pipeline stage 3: wait for memory (pass through font_x/font_y)
 
-	reg [2:0] p3_x, p3_y;
+	reg [4:0] p3_x, p3_y;
+	reg [2:0] p3_font_x, p3_font_y;
 	reg p3_start_of_frame;
 	reg p3_start_of_line;
 	reg p3_valid;
@@ -452,10 +510,11 @@ module svo_term #(
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p3_valid <= 0;
-		end else
-		if (pipeline_en) begin
+		end else if (pipeline_en) begin
 			p3_x <= p2_x;
 			p3_y <= p2_y;
+			p3_font_x <= p2_font_x;
+			p3_font_y <= p2_font_y;
 			p3_start_of_frame <= p2_start_of_frame;
 			p3_start_of_line <= p2_start_of_line;
 			p3_valid <= p2_valid;
@@ -463,28 +522,30 @@ module svo_term #(
 	end
 
 	// --------------------------------------------------------------
-	// Pipeline stage 4: read char
+	// Pipeline stage 4: read char (pass through font_x/font_y)
 
 	reg [7:0] p4_c;
-	reg [2:0] p4_x, p4_y;
+	reg [4:0] p4_x, p4_y;
+	reg [2:0] p4_font_x, p4_font_y;
 	reg p4_start_of_frame;
 	reg p4_valid;
 
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p4_valid <= 0;
-		end else
-		if (pipeline_en) begin
+		end else if (pipeline_en) begin
 			p4_c <= mem_portB_rdata;
 			p4_x <= p3_x;
 			p4_y <= p3_y;
+			p4_font_x <= p3_font_x;
+			p4_font_y <= p3_font_y;
 			p4_start_of_frame <= p3_start_of_frame;
 			p4_valid <= p3_valid;
 		end
 	end
 
 	// --------------------------------------------------------------
-	// Pipeline stage 5: font lookup
+	// Pipeline stage 5: font lookup (24x24 scaling)
 
 	reg [1:0] p5_outval;
 	reg p5_start_of_frame;
@@ -493,10 +554,10 @@ module svo_term #(
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p5_valid <= 0;
-		end else
-		if (pipeline_en) begin
+		end else if (pipeline_en) begin
 			if (32 <= p4_c && p4_c < 128)
-				p5_outval <= font(p4_c, p4_x, p4_y) ? 2'b10 : 2'b01;
+				// Scale: map 0-23 to 0-7 by dividing by 3
+				p5_outval <= font(p4_c, p4_font_x / 3, p4_font_y / 3) ? 2'b10 : 2'b01;
 			else
 				p5_outval <= 0;
 			p5_start_of_frame <= p4_start_of_frame;
