@@ -2,11 +2,34 @@ module top(
   input clk,
   input resetn,
 
+  output       led,
   output       tmds_clk_n,
   output       tmds_clk_p,
   output [2:0] tmds_d_n,
   output [2:0] tmds_d_p
 );
+
+// --- Blinking LED Logic ---
+// Assumes clk_p is ~25MHz (for 640x480@60Hz)
+// Count to 12,500,000 for a 0.5s toggle period (1s blink)
+reg [23:0] counter = 0;
+reg led_state = 0;
+always @(posedge clk_p or negedge sys_resetn) begin
+    if (!sys_resetn) begin
+        counter <= 0;
+        led_state <= 0;
+    end else begin
+        if (counter == 24'd12499999) begin
+            counter <= 0;
+            led_state <= ~led_state;
+        end else begin
+            counter <= counter + 1;
+        end
+    end
+end
+assign led = led_state;
+// --- End Blinking LED Logic ---
+
 
 Gowin_rPLL u_pll (
   .clkin(clk),
